@@ -11,6 +11,7 @@ const expressSession = require('express-session');
 const flash = require("connect-flash");
 
 var app = express();
+const port = process.env.PORT || 4000;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
