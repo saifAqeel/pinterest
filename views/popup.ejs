@@ -1,0 +1,47 @@
+<% include ./partials/header.ejs %>
+
+<div class="feed">
+    <% posts.forEach(post => { %>
+      <div class="post" onclick="openModal('<%= post._id %>')">
+        <img src="<%= post.image %>" alt="Post Image">
+        <h3><%= post.title %></h3>
+      </div>
+    <% }) %>
+  </div>
+
+  <!-- Modal -->
+  <div id="postModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal()"></div>
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">✖</span>
+      <div id="postDetails"></div>
+    </div>
+  </div>
+
+  <script>
+    // Open Modal
+    function openModal(postId) {
+      const modal = document.getElementById('postModal');
+      modal.classList.remove('hidden');
+      
+      // Fetch post details dynamically (optional)
+      fetch(`/post/${postId}`)
+        .then(response => response.json())
+        .then(data => {
+          const postDetails = `
+            <img src="${data.image}" alt="Post Image">
+            <h2>${data.title}</h2>
+            <p>${data.description}</p>
+          `;
+          document.getElementById('postDetails').innerHTML = postDetails;
+        });
+    }
+
+    // Close Modal
+    function closeModal() {
+      const modal = document.getElementById('postModal');
+      modal.classList.add('hidden');
+    }
+  </script>
+
+<% include ./partials/footer.ejs %>
