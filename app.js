@@ -7,7 +7,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const passport = require('passport');
-const expressSession = require('express-session');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const flash = require("connect-flash");
 
 var app = express();
@@ -18,10 +19,18 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(flash());
-app.use(expressSession({
+
+app.use(session({
+  secret: 'your-secret-key', // put in .env in real apps
   resave: false,
   saveUninitialized: false,
-  secret: "I wont tell"
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI, // same URI you're using for mongoose.connect()
+    collectionName: 'sessions',
+  }),
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
