@@ -1,3 +1,5 @@
+require('dotenv').config(); // Load environment variables at the top
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -6,6 +8,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
@@ -17,38 +20,38 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// session + flash setup
 app.use(flash());
 
 app.use(session({
-  secret: 'your-secret-key', // put in .env in real apps
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI, // same URI you're using for mongoose.connect()
+    mongoUrl: process.env.MONGO_URI,
     collectionName: 'sessions',
   }),
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 // 1 day
   }
 }));
+
+// passport setup
 app.use(passport.initialize());
 app.use(passport.session());
 passport.serializeUser(usersRouter.serializeUser());
 passport.deserializeUser(usersRouter.deserializeUser());
 
+// middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-require('dotenv').config();
-const PORT = process.env.PORT || 10000
-app.listen(PORT)
-
+// routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -57,13 +60,11 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
 
-module.exports = app;
+module.exports = app; // export the app so bin/www can start the server
