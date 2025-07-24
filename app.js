@@ -1,3 +1,7 @@
+require('dotenv').config();
+const PORT = process.env.PORT || 10000
+app.listen(PORT)
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
