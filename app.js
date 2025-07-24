@@ -1,7 +1,3 @@
-require('dotenv').config();
-const PORT = process.env.PORT || 10000
-app.listen(PORT)
-
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -16,7 +12,10 @@ const MongoStore = require('connect-mongo');
 const flash = require("connect-flash");
 
 var app = express();
-const port = process.env.PORT || 4000;
+require('dotenv').config();
+const PORT = process.env.PORT || 10000
+app.listen(PORT)
+// const port = process.env.PORT || 4000;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
